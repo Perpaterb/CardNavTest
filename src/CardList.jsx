@@ -66,115 +66,7 @@ const CardHolder = ({ activeCardIndex, setActiveCardIndex, cardHeights , overall
   let parth1 = true
   let xHasJustChanged = true 
 
-  useMotionValueEvent(scrollXProgress , "change", (x) => {
-    updateActiveCard(x)
-  })
-
-  const moveHolderLeftRight = (lr) => {
-
-    console.log("lr", lr)
-    // move the holder the by LR
-    setYToXmovment(yToXmovment + lr)
-    // work out if a card in in the middle
-    updateActiveCard(yToXmovment + lr)
-  }
-
-  const updateActiveCard = (x) => {
-    setXMovment(((cardHeights.length-1) * 700 * x) + yToXmovment)
-    xHasJustChanged = true
-    // if ( (Math.round(((cardHeights.length-1) * x) * 10 ) / 10).toString().split(".")[1] === "1" || (Math.round(((cardHeights.length-1) * x) * 10 ) / 10).toString().split(".")[1] === undefined ||(Math.round(((cardHeights.length-1) * x) * 10 ) / 10).toString().split(".")[1] === "9" ) {
-    if ( (Math.round(((cardHeights.length-1) * x + yToXmovment) * 10 ) / 10).toString().split(".")[1] === undefined) {
-    setActiveCardIndex(Math.round((cardHeights.length-1) * x + yToXmovment))
-    } else {
-      setActiveCardIndex(-1)
-    }
-  }; 
-      
-  useMotionValueEvent(scrollYProgress , "change", (y) => {
-    if (activeCardIndex !== -1){
-      if (xHasJustChanged === true){
-        xHasJustChanged = false
-        yStartPointA = overallHeight * y
-        yStartPointB = overallHeight * y
-      }
-
-      const tempArray = yMovmentArray
-      if (parth1 === true){
-        parth1 = false
-        yA= y
-        yclick = yA-yB
-        yStartPointA = overallHeight * y
-        if (tempArray[activeCardIndex] + (yStartPointA - yStartPointB) >= 0) {
-          if (tempArray[activeCardIndex] + (yStartPointA - yStartPointB) >= (cardHeights[activeCardIndex]-600)) {
-            tempArray[activeCardIndex] = (cardHeights[activeCardIndex]-600)
-            if (activeCardIndex < numberOfCards-1) {
-              //move left and right
-              moveHolderLeftRight((tempArray[activeCardIndex] + (yStartPointA - yStartPointB) - (cardHeights[activeCardIndex]-600))*-1)
-              setMoveOffY(y - yclick)
-
-
-              //setYToXmovment((tempArray[activeCardIndex] + (yStartPointA - yStartPointB) - (cardHeights[activeCardIndex]-600))*-1)
-              console.log("at bottom moving right" ,(tempArray[activeCardIndex] + (yStartPointA - yStartPointB) - (cardHeights[activeCardIndex]-600))*-1)
-              //updateActiveCard(0)
-            }
-          }else{
-            tempArray[activeCardIndex] = tempArray[activeCardIndex] + (yStartPointA - yStartPointB)
-          }
-        } else {
-          tempArray[activeCardIndex] = 0
-          if (activeCardIndex > 0) {
-            //move left and right
-            moveHolderLeftRight((tempArray[activeCardIndex] + (yStartPointA - yStartPointB))*-1)
-            setMoveOffY(y - yclick)
-
-
-            //setYToXmovment((tempArray[activeCardIndex] + (yStartPointA - yStartPointB))*-1)
-            console.log(("at top moving left" , tempArray[activeCardIndex] + (yStartPointA - yStartPointB))*-1)
-            //updateActiveCard(0)
-          }
-        }
-      }else{
-        parth1 = true
-        yB= y
-        yclick = yB-yA
-        yStartPointB = overallHeight * y
-        if (tempArray[activeCardIndex] + (yStartPointB - yStartPointA) >= 0) {
-          if (tempArray[activeCardIndex] + (yStartPointB - yStartPointA) >= (cardHeights[activeCardIndex]-600)) { 
-            tempArray[activeCardIndex] = (cardHeights[activeCardIndex]-600)
-            if (activeCardIndex < numberOfCards-1) {
-              //move left and right
-              moveHolderLeftRight((tempArray[activeCardIndex] + (yStartPointB - yStartPointA) - (cardHeights[activeCardIndex]-600))*-1)
-              setMoveOffY(y - yclick)
-
-
-              //setYToXmovment((tempArray[activeCardIndex] + (yStartPointB - yStartPointA) - (cardHeights[activeCardIndex]-600))*-1)
-              console.log("at bottom moving right" ,(tempArray[activeCardIndex] + (yStartPointB - yStartPointA) - (cardHeights[activeCardIndex]-600))*-1)
-              //updateActiveCard(0)
-            }
-          }else{
-            tempArray[activeCardIndex] = tempArray[activeCardIndex] + (yStartPointB - yStartPointA)
-          }
-        } else {
-          tempArray[activeCardIndex] = 0
-          if (activeCardIndex > 0) {
-            //move left and right
-            moveHolderLeftRight((tempArray[activeCardIndex] + (yStartPointB - yStartPointA))*-1)
-            setMoveOffY(y - yclick)
-
-
-            //setYToXmovment((tempArray[activeCardIndex] + (yStartPointB - yStartPointA))*-1)
-            console.log("at top moving left" , (tempArray[activeCardIndex] + (yStartPointB - yStartPointA))*-1)
-            //updateActiveCard(0)
-          }
-        }
-      }     
-      setYMovmentArray(tempArray)
-    }else{
-      //moveHolderLeftRight(holderWidth * y *-1)
-      setYToXmovment((holderWidth * (y-moveOffY) *-1 * 4))
-      //updateActiveCard(0)
-    }
-  })
+  setActiveCardIndex(-1)
 
   console.log("yToXmovment", yToXmovment,"xMovment" ,xMovment)
   return (
@@ -205,6 +97,7 @@ const CardHolder = ({ activeCardIndex, setActiveCardIndex, cardHeights , overall
 
 // BasePlate Component
 const BasePlate = ({ activeCardIndex, setActiveCardIndex, cardHeights, screenSize, numberOfCards}) => {
+
   let overallHeight = 0
   for (let i = 0; i < cardHeights.length; i++) {
     overallHeight += cardHeights[i];
@@ -240,6 +133,86 @@ const App = () => {
   const [cardHeights, setCardHeights] = useState([]);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
+
+    // navigation
+    useEffect(() => {
+      const handleKeyDown = (event) => {
+        switch(event.keyCode) {
+          case 37: // arrow left
+            //event.preventDefault();
+            // navigation logic for left
+            moveLeft()
+            break;
+          case 38: // arrow up
+            //event.preventDefault();
+            // navigation logic for up
+            moveUp()
+            break;
+          case 39: // arrow right
+            //event.preventDefault();
+            // navigation logic for right
+            moveRight()
+            break;
+          case 40: // arrow down
+            //event.preventDefault();
+            // navigation logic for down
+            moveDown()
+            break;
+          default:
+            break;
+        }
+      };
+  
+      const handleWheel = (event) => {
+        if (event.deltaY < 0) {
+          // Custom navigation logic for scroll up
+          moveUp()
+        } else {
+          // Custom navigation logic for scroll down
+          moveDown()
+        }
+      };
+  
+      const handleTouchstart = (event) => {
+        if (event.deltaY < 0) {
+          // Custom navigation logic for scroll up
+          moveUp()
+        } else {
+          // Custom navigation logic for scroll down
+          moveDown()
+        }
+      };
+  
+      window.addEventListener('keydown', function(event) {
+        handleKeyDown(event)
+      }, {passive:false});
+      window.addEventListener('touchstart', function(event) {
+        handleTouchstart(event)
+      }, {passive:false});
+      window.addEventListener('wheel', function(event) {
+        handleWheel(event)
+      }, {passive:false});
+  
+      // Cleanup function to remove event listener on component unmount
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('touchstart', handleTouchstart);
+        window.removeEventListener('wheel', handleWheel);
+      };
+    }, []);
+  
+    const moveLeft = () => {
+    }
+  
+    const moveRight = () => {
+    }
+  
+    const moveUp = () => {
+    }
+  
+    const moveDown = () => {
+    }
+
 
   useEffect(() => {
     const tempHeightArray = cardHeights
@@ -281,5 +254,4 @@ function getCurrentDimension(){
       height: window.innerHeight
   }
 }
-
 export default App;
