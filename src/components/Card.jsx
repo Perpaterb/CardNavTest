@@ -1,9 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion , useScroll, useMotionValue, useTransform, useMotionValueEvent } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, useReducedMotion} from "framer-motion";
+import InerCard from "./InerCard";
 
-function Card({ height, isActive, overallHeight, yMovmentArray, index}) {
+function getXPoseOfset(distenceFromActivecard) {
+  let output = 0
+  if (distenceFromActivecard >= 0){
+    output = Math.pow(distenceFromActivecard, 1.4) * -130;
+  }else{
+    output = (Math.pow(Math.abs(distenceFromActivecard),1.4) * -130) *-1;
+  } 
+  return output;
+}
+
+function Card({ height, isActive, overallHeight, index, upDownMovment, activeCardIndex,displayType,numberOfCards}) {
     const [rerender, setRerender] = useState(false)
+    const shouldReduceMotion = useReducedMotion()
+    let animate
+
     const [time, setTime] = useState(new Date());
+
     useEffect(() => {
       const interval = setInterval(() => {
         setTime(new Date());
@@ -11,23 +26,32 @@ function Card({ height, isActive, overallHeight, yMovmentArray, index}) {
   
       setRerender(!rerender);
       return () => clearInterval(interval);
+ 
     }, []);
-  
   
     const cardVariants = {
       active: {
-        y: -yMovmentArray[index],  // simple up and down movement, replace with actual desired values
-        backgroundColor: "red"
+        y: upDownMovment[index],  // simple up and down movement, replace with actual desired values
+        backgroundColor: "red",
+        zIndex: numberOfCards,
       },
       inactive: {
-         y: -yMovmentArray[index],
-         backgroundColor: "blue"
+         y: upDownMovment[index],
+         backgroundColor: "blue",
+         zIndex: numberOfCards - Math.abs(activeCardIndex - index),
+         x: getXPoseOfset(index - activeCardIndex)
       }
     };
-  
+
+ 
+    animate = isActive ? 'active' : 'inactive'
+
+
+    //console.log("upDownMovment", upDownMovment,"activeCardIndex" ,activeCardIndex)
     return (
       <motion.div 
         style={{
+          //top: upDownMovment[index],
           flex: "0 0 auto",
           width: "696px",
           height: `${height}px`,
@@ -35,9 +59,16 @@ function Card({ height, isActive, overallHeight, yMovmentArray, index}) {
           backgroundColor: "lightgray",
         }}
         variants={cardVariants}
-        animate={isActive ? 'active' : 'inactive'}
+        animate={animate}
       >
-        {height} {isActive ? 'active' : 'inactive'}
+        {height} {animate}
+        activeCardIndex {activeCardIndex}
+        <InerCard
+        activeCardIndex={activeCardIndex}
+        cardIndex={index}
+        numberOfCards={numberOfCards}
+        
+        />
       </motion.div>
     );
 }

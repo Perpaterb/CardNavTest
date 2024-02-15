@@ -1,22 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion , useScroll, useMotionValue, useTransform, useMotionValueEvent } from "framer-motion";
+import React, { useState, useEffect } from "react";
 import BasePlate from "./BacePlate";
 
 
 function Main() {
     const numberOfCards = 20;
-    const [cardHeights, setCardHeights] = useState([]);
-    const [activeCardIndex, setActiveCardIndex] = useState(0);
-    const [screenSize, setScreenSize] = useState(getCurrentDimension());
-   
-    useEffect(() => {
-      const tempHeightArray = cardHeights
-      for (let i = 0; i < numberOfCards; i++) {
-        tempHeightArray[i] = Math.floor(600 + Math.random() * 2400)
-      }
-      setCardHeights(tempHeightArray)
-    }, [])
     
+    const [screenSize, setScreenSize] = useState(getCurrentDimension());
+    const [displayType, setDisplayType] = useState(0);
+   
+   
     useEffect(() => {
       const updateDimension = () => {
         setScreenSize(getCurrentDimension())
@@ -34,11 +26,9 @@ function Main() {
     
     return (
       <BasePlate 
-      activeCardIndex={activeCardIndex}
-      setActiveCardIndex={setActiveCardIndex}
-      cardHeights={cardHeights}
       screenSize={screenSize}
       numberOfCards={numberOfCards}
+      displayType={displayType}
       />
     );
   }
